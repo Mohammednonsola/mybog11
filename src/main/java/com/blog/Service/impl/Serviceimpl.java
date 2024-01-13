@@ -1,6 +1,7 @@
 package com.blog.Service.impl;
 
 import com.blog.Entity.PostEntity;
+import com.blog.Exception.ResourceNotFoundException;
 import com.blog.Repository.PostRepository;
 import com.blog.Service.PostService;
 import com.blog.payload.PostDto;
@@ -33,5 +34,18 @@ public class Serviceimpl implements PostService{
      dto.setDescription(save.getDescription());
      dto.setTitle(save.getTitle());
         return dto;
+    }
+
+    @Override
+    public PostDto findbyid(long id) {
+        PostEntity postEntity = repository.findById(id).orElseThrow(
+                () ->new ResourceNotFoundException("id not found : "+id)
+        );
+        PostDto dto=new PostDto();
+        dto.setId(postEntity.getId());
+        dto.setTitle(postEntity.getTitle());
+        dto.setContent(postEntity.getContent());
+        dto.setDescription(postEntity.getDescription());
+        return dto ;
     }
 }
