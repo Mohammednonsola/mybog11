@@ -1,5 +1,7 @@
 package com.blog.Controller;
 
+import com.blog.Employees;
+import com.blog.Entity.PostEntity;
 import com.blog.Service.PostService;
 import com.blog.payload.PostDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,15 +10,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/post")
 public class PostController {
-    @Autowired
-    private PostService service;
+  private PostService service;
+
+    public PostController(PostService service) {
+        this.service = service;
+    }
 
 
- @PostMapping
+    @PostMapping
     public ResponseEntity<PostDto> Post(@RequestBody  PostDto postDto){
     PostDto dto=service.createpost(postDto);
 
@@ -25,8 +31,29 @@ public class PostController {
  }
  @GetMapping
 public ResponseEntity<PostDto> PostFindbyid(@RequestParam long id){
-     service.findbyid(id);
-     return null;
+     PostDto findbyid = service.findbyid(id);
+     return new ResponseEntity<>(findbyid,HttpStatus.INTERNAL_SERVER_ERROR);
  }
+ @GetMapping("/")
+    public List<PostDto> findall(
+            @RequestParam(name = "PageNo",required = false,defaultValue = "0") int PageNo,
+            @RequestParam(name = "PageSize",required = false,defaultValue = "3") int PageSize
+
+ ){
+     List<PostDto> findalll = service.findalll(PageNo,PageSize);
+
+     return findalll;
+ }
+@DeleteMapping("/{id}")
+    public ResponseEntity<?> deletebyid(@PathVariable long id){
+        service.find(id);
+        return new ResponseEntity<>("delete by title",HttpStatus.OK);
+}
+
+@PutMapping("/{id}")
+    public ResponseEntity<PostDto> update(@PathVariable long id,@RequestBody PostDto dto){
+    PostDto update = service.update(id, dto);
+    return new ResponseEntity<>(update,HttpStatus.OK);
+}
 
 }
