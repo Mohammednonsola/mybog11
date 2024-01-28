@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -43,8 +44,9 @@ public class Serviceimpl implements PostService{
     }
 
     @Override
-    public List<PostDto> findalll(int pageNo, int pageSize) {
-        Pageable request = PageRequest.of(pageNo, pageSize);
+    public List<PostDto> findalll(int pageNo, int pageSize, String sortby, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortby).ascending() : Sort.by(sortby).descending();
+        Pageable request = PageRequest.of(pageNo, pageSize, sort);
         Page<PostEntity> all = repository.findAll(request);
         List<PostEntity> content = all.getContent();
         List<PostDto> collect = content.stream().map(p -> mapToDto(p)).collect(Collectors.toList());

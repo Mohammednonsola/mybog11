@@ -10,7 +10,7 @@ public interface PostService  {
 //
   PostDto findbyid(long id);
 //
-  List<PostDto> findalll(int pageNo, int pageSize);
+  List<PostDto> findalll(int pageNo, int pageSize, String sortby, String sortDir);
 
 
   void find(long id);

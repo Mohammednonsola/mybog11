@@ -37,10 +37,12 @@ public ResponseEntity<PostDto> PostFindbyid(@RequestParam long id){
  @GetMapping("/")
     public List<PostDto> findall(
             @RequestParam(name = "PageNo",required = false,defaultValue = "0") int PageNo,
-            @RequestParam(name = "PageSize",required = false,defaultValue = "3") int PageSize
+            @RequestParam(name = "PageSize",required = false,defaultValue = "3") int PageSize,
+            @RequestParam(name = "sortby",required = false,defaultValue = "id") String sortby,
+            @RequestParam(name = "sortDir",required = false,defaultValue = "id") String sortDir
 
  ){
-     List<PostDto> findalll = service.findalll(PageNo,PageSize);
+     List<PostDto> findalll = service.findalll(PageNo,PageSize,sortby,sortDir);
 
      return findalll;
  }
