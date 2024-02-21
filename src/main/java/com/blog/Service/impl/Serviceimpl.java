@@ -5,10 +5,12 @@ import com.blog.Exception.ResourceNotFoundException;
 import com.blog.Repository.PostRepository;
 import com.blog.Service.PostService;
 import com.blog.payload.PostDto;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +24,8 @@ public class Serviceimpl implements PostService{
 
     @Autowired
     private PostRepository repository;
-
+@Autowired
+private ModelMapper modelMapper;
 
 
 
@@ -43,8 +46,9 @@ public class Serviceimpl implements PostService{
     }
 
     @Override
-    public List<PostDto> findalll(int pageNo, int pageSize) {
-        Pageable request = PageRequest.of(pageNo, pageSize);
+    public List<PostDto> findalll(int pageNo, int pageSize, String sortby, String sortDir) {
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortby).ascending() : Sort.by(sortby).descending();
+        Pageable request = PageRequest.of(pageNo, pageSize, sort);
         Page<PostEntity> all = repository.findAll(request);
         List<PostEntity> content = all.getContent();
         List<PostDto> collect = content.stream().map(p -> mapToDto(p)).collect(Collectors.toList());
@@ -64,31 +68,22 @@ public class Serviceimpl implements PostService{
 
     @Override
     public PostDto update(long id, PostDto dto) {
-        PostEntity byId = repository.findById(id).orElseThrow(
-                ()->new ResourceNotFoundException("id"+id)
+        PostEntity existingEntity = repository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("id " + id + " not found")
         );
-        PostEntity entity = maptoEntity(dto);
-        PostEntity save = repository.save(entity);
-        PostDto dto1 = mapToDto(save);
-        return dto1;
+        modelMapper.map(dto, existingEntity);
+        PostEntity updatedEntity = repository.save(existingEntity);
+        return mapToDto(updatedEntity);
     }
 
     PostDto  mapToDto(PostEntity post){
-        PostDto dto=new PostDto();
-        dto.setId(post.getId());
-        dto.setTitle(post.getTitle());
-        dto.setDescription(post.getDescription());
-        dto.setContent(post.getContent());
-     return dto;
+        PostDto dto = modelMapper.map(post, PostDto.class);
+        return dto;
   }
 
 PostEntity maptoEntity(PostDto dto){
-        PostEntity entity=new PostEntity();
-        entity.setId(dto.getId());
-        entity.setDescription(dto.getDescription());
-        entity.setContent(dto.getContent());
-        entity.setTitle(dto.getTitle());
-     return entity;
+    PostEntity entity = modelMapper.map(dto, PostEntity.class);
+    return entity;
 }
 
 }

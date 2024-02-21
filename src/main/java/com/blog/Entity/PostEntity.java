@@ -1,9 +1,11 @@
 package com.blog.Entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Table(name = "blog")
@@ -17,5 +19,7 @@ public class PostEntity {
     private String description;
     private String content;
     private String Title;
+    @OneToMany(mappedBy = "postEntity",cascade = CascadeType.ALL)
+    private List<Comments> comments;
 
 }
